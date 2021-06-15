@@ -1,40 +1,75 @@
-var input = require('fs').readFileSync('stdin', 'utf8');
-var lines = input.split('\n');
-// ['14 3', 'nome 3343' , 'nom2 3234']  
-//
+var input = require("fs").readFileSync("stdin", "utf8")
+var lines = input.split("\n")
 
-const primeira_linha = lines.shift().split(' ') // Remove a primeira linha para poder pegar as informaçoes necessarias
-const qtd_jogadores = parseInt(primeira_linha[0])
-const qtd_times     = parseInt(primeira_linha[1])
+class Player {
+    constructor (name, hability){
+        this.name = name;
+        this.hability = hability;
+    }
+};
 
+var quantityPlayer = lines[0].split(' ')[0];
+var quantityTeams = lines[0].split(' ')[1];
 
-novos_jogadores = lines.map( ell => {
-    sep = ell.split(' ')
-    return [ sep[0], parseInt(sep[1]) ]
-})
+let players = [];
 
-novos_jogadores.sort( (a,b)=> a[1] - b[1] )
+for( let i = 1; i <= quantityPlayer; i++)
+{
+    let playerName = lines[i].split(' ')[0];
+    let playerSkill = lines[i].split(' ')[1];
 
-const times = []
-for (let index = 0; index < qtd_times; index++) {
-    times.push([])
+    let newPlayer = new Player(playerName, parseInt(playerSkill));
+
+    players.push(newPlayer);
 }
 
-var conta = 0;
+const ordene = (playerArray) => {
+    let flag = 0;
+    let aux;
 
-for (let index = 0; index < qtd_jogadores; index++) {
-    times[conta].push(novos_jogadores.pop())
-    conta++;
-    if (conta == qtd_times){
-        conta = 0;        
+    for ( let i = 0; i < playerArray.length - 1; i++ )
+    {
+        if(playerArray[i].hability < playerArray[i+1].hability)
+        {
+            aux = playerArray[i]
+            playerArray[i] = playerArray[i+1]
+            playerArray[i+1] = aux
+
+            flag = 1
+        }
+    }
+
+    if(flag == 1)
+        playerArray = ordene(playerArray)
+
+    return playerArray
+}
+
+players = ordene(players)
+
+let teams = []
+
+for( let i = 0;i < quantityTeams; i++)
+{
+    teams.push([])
+}
+
+while(players.length > 0)
+{
+    for( let i = 0; i < quantityTeams; i++)
+    {
+        if(players.length == 0)
+            break
+
+        teams[i].push(players[0].name)
+        players.shift()
     }
 }
 
-for (let index = 0; index < qtd_times; index++) {
-    console.log(`Time ${index+1}`);
-    times[index].sort()
-    times[index].forEach(element => {
-        console.log(element[0]);
-    });
-    console.log(' ');
-}
+teams.map((time, index)=>{
+    console.log(`Time ${index + 1}`)
+    time.sort().map(player=>{
+        console.log(player);
+    })
+   console.log("")
+})
